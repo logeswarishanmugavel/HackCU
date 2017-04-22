@@ -7,6 +7,7 @@
     <!--Angular js-->
     <script src="/static/js/lib/angular.min.js"></script>
     <script src="/static/js/lib/angular-route.js"></script>
+    <script src="/static/js/lib/angular-facebook.js"></script>
 
     <!--Bootstrap js-->
     <script src="/static/js/lib/jquery.min.js"></script>
@@ -22,25 +23,7 @@
 </head>
 
 <body ng-app="bikeApp">
-<script>
-    window.fbAsyncInit = function() {
-        FB.init({
-            appId      : '405452559812718',
-            xfbml      : true,
-            version    : 'v2.9'
-        });
-        FB.AppEvents.logPageView();
-    };
-
-    (function(d, s, id){
-        var js, fjs = d.getElementsByTagName(s)[0];
-        if (d.getElementById(id)) {return;}
-        js = d.createElement(s); js.id = id;
-        js.src = "//connect.facebook.net/en_US/sdk.js";
-        fjs.parentNode.insertBefore(js, fjs);
-    }(document, 'script', 'facebook-jssdk'));
-</script>
-
+<div ng-controller="loginController">
 <!--navbar-->
 <nav class = "navbar navbar-toggleable-md navbar-light" style = "font-size: 20px">
     <a class="navbar-brand" href="/#/">HackCU</a>
@@ -53,7 +36,7 @@
                 </a>
                 <ul class="dropdown-menu">
                     <li>
-                        <button class = "nav-link" ng-click="login()">Facebook</button>
+                        <button type="button" ng-click="login('facebook')">Facebook</button>
                     </li>
                     <li>
                         <a class = "nav-link" href="/#/">Fitbit</a>
@@ -94,7 +77,7 @@
 <footer class="company">
     <p><center> &copy; HackCU, 2017.</center></p>
 </footer>
-
+</div>
 </body>
 
 </html>
