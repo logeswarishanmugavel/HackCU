@@ -26,12 +26,14 @@ def shutdown_session(exception=None):
 
 @app.route('/')
 def home():
-    return render_template('pages/placeholder.home.html')
+    return render_template('/layouts/main.html')
 
 
+'''
 @app.route('/about')
 def about():
     return render_template('pages/placeholder.about.html')
+    '''
 
 
 # Error handlers.
