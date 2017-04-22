@@ -2,8 +2,18 @@
 # Imports
 # ----------------------------------------------------------------------------#
 
-from flask import Flask, render_template, send_file, jsonify, json, request
+from flask import Flask, render_template, jsonify
 from models import db_session
+import json
+import requests
+
+from pprint import pprint
+
+
+
+API_KEY = 'ToZQl1qWNAYdhWRtGKocMb4tG9vEQa7g'
+MAPQUEST_URL = 'http://open.mapquestapi.com/directions/v2/route?key={appkey}'
+MAPQUEST_TRAFFIC_URL='http://www.mapquestapi.com/traffic/v2/incidents?key={appkey}&inFormat=json&outFormat=json'
 
 # ----------------------------------------------------------------------------#
 # App Config.
@@ -28,13 +38,61 @@ def shutdown_session(exception=None):
 def home():
     return render_template('/layouts/main.html')
 
-
 '''
 @app.route('/about')
 def about():
     return render_template('pages/placeholder.about.html')
     '''
 
+
+
+@app.route('/getdirections')
+def get_route():
+
+    ## get route information along with traffic information.
+
+    ## TODO: add from user request.
+
+    src = 'Boulder, CO'
+    dest = 'Denver, CO'
+
+    result = "helo"
+
+    request_body = {
+        'locations': [
+            src,
+            dest
+        ]
+    }
+
+    r = requests.post(MAPQUEST_URL.format(appkey=API_KEY),
+                      data=json.dumps(request_body)
+                      )
+    if r.status_code != 200:
+        # We didn't get a response from Mapquest
+        print "error"
+
+    result = json.loads(r.content)
+    bounding_box = result['route']['boundingBox']
+    #print pprint(result)
+
+    traffic_info = get_traffic_info(bounding_box)
+
+    #print pprint(traffic_info)
+
+
+    return json.dumps(result)
+
+def get_traffic_info(bounding_box):
+
+    request_body_traffic = {'boundingBox':bounding_box, 'filters':["construction","incidents","congestion"]}
+
+    r  = requests.post(MAPQUEST_TRAFFIC_URL.format(appkey=API_KEY),
+                       data=json.dumps(request_body_traffic)
+                       )
+    result = json.loads(r.content)
+
+    return jsonify(result=result)
 
 # Error handlers.
 
