@@ -12,6 +12,9 @@
     <script src="/static/js/lib/jquery.min.js"></script>
     <script src="/static/js/lib/bootstrap.min.js"></script>
 
+    <!--Controllers-->
+    <script src="/static/js/app.js"></script>
+
     <!--StyleSheets-->
     <link rel="stylesheet" href="/static/css/bootstrap-3.1.1.min.css">
 
@@ -21,8 +24,9 @@
 <body ng-app="bikeApp">
 
 <!--navbar-->
-<nav class = "navbar navbar-toggleable-md navbar-light">
+<nav class = "navbar navbar-toggleable-md navbar-light" style = "font-size: 20px">
     <a class="navbar-brand" href="/#/">HackCU</a>
+    <!--before login-->
     <div class = "collapse navbar-collapse">
         <ul class = "nav nav-pills pull-right">
             <li class = "nav-item">
@@ -40,6 +44,28 @@
             </li>
         </ul>
     </div>
+    <!--after login-->
+    <!--
+    <div class = "collapse navbar-collapse">
+        <ul class = "nav nav-pills pull-right">
+            <li class = "nav-item">
+                <a class = "nav-link" href="/#/">About</a>
+            </li>
+            <li class = "nav-item">
+                <a class = "nav-link" href="/#/">About</a>
+            </li>
+            <li class = "nav-item">
+                <a class = "nav-link" href="/#/">About</a>
+            </li>
+            <li class = "nav-item">
+                <a class = "nav-link" href="/#/">About</a>
+            </li>
+            <li class = "nav-item">
+                <a class = "nav-link" href="/#/">About</a>
+            </li>
+        </ul>
+    </div>
+    -->
 </nav>
 
 <div ng-view></div>
