@@ -1,63 +1,56 @@
-<!-- Google Map API KEY: AIzaSyAmjBBQJ67u2gmCdTJWtEoUEDeZVL3ZyTQ -->
-
+<!doctype html>
 <html>
 <head>
-    <title>Project 1</title>
+    <title> HackCU </title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!--Angular js-->
+    <script src="/static/js/angular.min.js"></script>
+    <script src="/static/js/angular-route.js"></script>
 
-    <!-- Load Style Sheets -->
-    <link rel="stylesheet" type="text/css" href="/static/css/googleMapStyle.css"/>
-    <link rel="stylesheet" type="text/css" href="/static/css/normalize.css">
-    <link rel="stylesheet" type="text/css" href="/static/css/skeleton.css">
-    <link rel="stylesheet" type="text/css" href="/static/css/bootstrap-3.1.1.min.css">
+    <!--Bootstrap js-->
+    <script src="/static/js/jquery.min.js"></script>
+    <script src="/static/js/bootstrap.min.js"></script>
 
-
-    <!-- Load Javascripts (Libraries and External) -->
-    <script> function initMap() {} </script>
-    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAmjBBQJ67u2gmCdTJWtEoUEDeZVL3ZyTQ&callback=initMap"
-            type="text/javascript"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js" type="text/javascript"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js" type="text/javascript"></script>
-    <script src="/static/js/d3.min.js"></script>
-    <script src="/static/js/d3pie.min.js"></script>
-    <script src="https://d3js.org/d3-geo.v1.min.js"></script>
-    <script src="/static/js/spin.js"></script>
-    <script src="/static/js/lodash.js"></script>
-
-
-    <!-- Load Javascripts (Custom) -->
-    <script src="/static/js/setup.js"></script>
-    <script src="/static/js/initializeVisualization.js"></script>
-    <script src="/static/js/googleMapScript.js"></script>
-    <script src="/static/js/pieChartVisualization.js"></script>
-    <script src="/static/js/marketSummaryVis.js"></script>
-    <script src="/static/js/tempData.js"></script>
-
+    <!--StyleSheets-->
+    <link rel="stylesheet" href="/static/css/bootstrap-3.1.1.min.css">
 
 
 </head>
 
-<body onload=initialize();>
-<div class="container well">
-    <p > <h1 class="text-center">Zayo Market Analysis</h1> </p>
-</div>
-<div id = "loading_data_div">
-    <div id=main_div class="container">
+<body ng-app="bikeApp">
 
-        <div id="vis_row1" class="row">
-
-        </div>
-
-        <div id="vis_row2" class="row">
-
-        </div>
-
-        <div id="vis_row3" class="row">
-
-        </div>
-
+<!--navbar-->
+<nav class = "navbar navbar-toggleable-md navbar-light">
+    <a class="navbar-brand" href="/#/">HackCU</a>
+    <div class = "collapse navbar-collapse">
+        <ul class = "nav nav-pills pull-right">
+            <li class = "nav-item">
+                <a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
+                    Login <span class="caret"></span>
+                </a>
+                <ul class="dropdown-menu">
+                    <li>
+                        <a class = "nav-link" href="/#/">Facebook</a>
+                    </li>
+                    <li>
+                        <a class = "nav-link" href="/#/">Fitbit</a>
+                    </li>
+                </ul>
+            </li>
+        </ul>
     </div>
-</div>
-</body>
+</nav>
 
+<div ng-view></div>
+
+<hr/>
+
+<!--Footer-->
+<footer class="company">
+    <p><center> &copy; HackCU, 2017.</center></p>
+</footer>
+
+</body>
 
 </html>
