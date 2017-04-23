@@ -60,19 +60,33 @@ bikeApp.config(['$routeProvider','$locationProvider',
     }]);
 
 bikeApp.controller('loginController',[
-    '$scope','facebook', function ($scope,facebook) {
+    '$scope','$http','facebook', function ($scope,$http,facebook) {
         $scope.beforeloginnavbar = true;
         $scope.afterloginnavbar = false;
         $scope.login = function () {
-            facebook.login(function (data) {
-                console.log(data);
+            facebook.login(function (loginData) {
                 $scope.beforeloginnavbar = false;
                 $scope.afterloginnavbar = true;
-            });
-        };
-        $scope.getDetails = function () {
-            facebook.details(function (data) {
-                console.log(data);
+                facebook.details(function (details) {
+                    var re_details = {};
+                    re_details["name"] = details["name"];
+                    re_details["age"] = parseInt(details["age_range"]["min"]);
+                    re_details["gender"]  = details["gender"];
+                    re_details["email_id"] = details["email"];
+                    re_details["fb_id"] = details["id"];
+                    var req = {
+                        method: 'POST',
+                        url: '/adduser',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        data: JSON.stringify(re_details)
+                    };
+                    console.log (req);
+                    $http(req).then(function (resp) {
+                        console.log(resp);
+                    });
+                });
             });
         };
         $scope.logout = function () {
@@ -86,22 +100,40 @@ bikeApp.controller('loginController',[
 ]);
 
 bikeApp.controller('RouteController', function($scope, $http) {
+    var map;
+    $scope.narratives = [];
+    $scope.distance = 0;
+    $scope.time = 0;
 
-    $scope.route = {};
-
-    /*
     $scope.getdirections = function(){
+            if(map)
+                map.remove();
+                    var src = $scope.route.source;
+                    var dest = $scope.route.destination;
+                    map = L.map('map', {
+                        layers: MQ.mapLayer(),
+                        dragging: true
+                      });
+
+
 					$http({
-						method: 'POST',
-						url: '/getdirections',
-						data: $.param($scope.route),
-						headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+						method: 'GET',
+						url: '/getDirections/'+src+"/"+dest
 					}).then(function(response) {
 					    console.log(response);
-						$scope.route = {}
+					    $scope.narratives = response.data.narratives;
+					    var control = L.Routing.control({
+                                             waypoints: response.data.lat_long,
+                                             draggableWaypoints: false,
+                                             show: false,
+                                             createMarker: function(i,waypoints,n){
+                                                if(i==0||i==n-1)
+                                                    return L.marker(waypoints.latLng);
+                                               }
+                                           }).addTo(map);
 					}, function(error) {
 						console.log(error);
 					});
+
 	}
-	*/
 });

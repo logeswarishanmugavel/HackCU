@@ -1,5 +1,5 @@
 <hr/>
-<div ng-controller = "RouteController" class="container-fluid">
+<div ng-controller = "RouteController" ng-init = "mapinit()" class="container-fluid" style = "font-size:20px">
     <!-- Page Heading/Breadcrumbs -->
     <div class="row">
         <div class="col-lg-12">
@@ -12,8 +12,8 @@
         </div>
     </div>
     <div class = "row">
-        <div class = "col-xs-5">
-            <form name = "route_form" ng-submit="" novalidate>
+        <div class = "col-xs-4">
+            <form name = "route_form" ng-submit="getdirections()" novalidate>
                 <div class = "form-group" ng-class="{ 'has-error' : route_form.source.$invalid && !route_form.source.$pristine }">
                     <label class = "control-label">Source</label>
                     <input type = "text" class = "form-control" ng-model = "route.source" name="source" required>
@@ -24,18 +24,21 @@
                     <input type = "text" class = "form-control" ng-model = "route.destination" name="destination" required>
                     <p ng-show="route_form.destination.$invalid && !route_form.destination.$pristine" class="help-block">Required field</p>
                 </div>
-                <button type="submit" class="btn btn-primary" style = "width:30%; font-size: 22px" ng-disabled="route_form.$invalid">Search Routes</button>
                 <div>
-                    <ol>
-                        <li>
+                    <button type="submit" class="btn btn-primary" ng-disabled="route_form.$invalid" style ="font-size:21px;">Search Routes</button></center>
+                </div>
 
+                <div class = "container" style="padding-top:20px">
+                    <ol class = "list-group">
+                        <li ng-Repeat = "narrative in narratives">
+                            {{ narrative }}
                         </li>
                     </ol>
                 </div>
             </form>
         </div>
-        <div class = "col-xs-7">
-            <div id="mapid"></div>
+        <div class = "col-xs-8">
+            <div id="map"></div>
         </div>
     </div>
 </div>
