@@ -61,7 +61,7 @@ def get_weather_conditions(bounding_box):
     if f.status_code !=200:
         print "error while fetching weather conditions."
     json_parse = f.text
-    return jsonify({'weather':json_parse})
+    return {'weather':json_parse}
 
 
 
@@ -111,8 +111,7 @@ def get_search_results(addr):
     else:
         search_results = "No results found."
 
-    ret = {'search_results':search_results}
-    return jsonify(ret)
+    return search_results
 
 
 @app.route('/getDirections/<src>/<dest>')
@@ -142,9 +141,7 @@ def get_route(src, dest):
             'enhancedNarrative': 'false',
             'drivingStyle':2,
             'highwayEfficiency': 21.0,
-            'roadGradeStrategy': 'FAVOR_ALL_HILLS ',
-             'timeType':1,
-
+            'roadGradeStrategy': 'FAVOR_ALL_HILLS'
         }
     }
 
@@ -156,13 +153,30 @@ def get_route(src, dest):
         print "error"
 
     result = json.loads(r.content)
+
+    narrative_list, lat_long_list = get_lat_long_route(result)
     bounding_box = result['route']['boundingBox']
 
     weather_conditions = get_weather_conditions(bounding_box)
 
     traffic_info = get_traffic_info(bounding_box)
 
+    final_result = {'narratives': narrative_list,'lat_long':lat_long_list,'traffic':traffic_info,'weather':weather_conditions}
     return json.dumps(result)
+
+# result['route']['legs'][0]['maneuvers']
+def get_lat_long_route(result):
+
+    narrative_list = []
+    lat_long_list = []
+    directions = result['route']['legs'][0]['maneuvers']
+    dir_len = len(directions)
+
+    for i in range(dir_len):
+        narrative_list.append(str(result['route']['legs'][0]['maneuvers'][i]['narrative']))
+        lat_long_list.append(result['route']['legs'][0]['maneuvers'][i]['startPoint'])
+
+    return narrative_list, lat_long_list
 
 def get_traffic_info(bounding_box):
 
@@ -173,7 +187,7 @@ def get_traffic_info(bounding_box):
                        )
     result = json.loads(r.content)
 
-    return jsonify(result=result)
+    return result
 
 # Error handlers.
 
