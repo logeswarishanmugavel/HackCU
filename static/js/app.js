@@ -100,22 +100,47 @@ bikeApp.controller('loginController',[
 ]);
 
 bikeApp.controller('RouteController', function($scope, $http) {
+    //var map;
+    $scope.directions = [
+    {"lng": -77.077957,"lat": 38.893165},
+    {"lng": -77.077407,"lat": 38.893276},
+    {"lng": -77.077087,"lat": 38.890857},
+    {"lng": -77.077148,"lat": 38.890842},
+    {"lng": -77.089424,"lat": 38.87355},
+    {"lng": -77.088119,"lat": 38.867782},
+    {"lng": -77.088584,"lat": 38.855186},
+    {"lng": -77.08123,"lat": 38.848926}
+    ];
 
-    $scope.route = {};
+    $scope.mapinit = function() {
+          // map.off();
+    }
 
-    /*
     $scope.getdirections = function(){
+                    var src = $scope.route.source;
+                    var dest = $scope.route.destination;
+                    var map = L.map('map', {
+                        layers: MQ.mapLayer(),
+                        zoom: 12
+                      });
+
+                   //var marker = L.marker([51.5, -0.09]).addTo(map);
+                   var control = L.Routing.control({
+                     waypoints: $scope.directions,
+                     show: true,
+                     waypointMode: 'snap',
+                     createMarker: function() {}
+                   }).addTo(map);
+
+
 					$http({
-						method: 'POST',
-						url: '/getdirections',
-						data: $.param($scope.route),
-						headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+						method: 'GET',
+						url: '/getDirections/'+src+"/"+dest
 					}).then(function(response) {
 					    console.log(response);
-						$scope.route = {}
 					}, function(error) {
 						console.log(error);
 					});
+
 	}
-	*/
 });
