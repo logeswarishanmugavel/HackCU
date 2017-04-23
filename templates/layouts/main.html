@@ -13,71 +13,86 @@
     <script src="/static/js/lib/jquery.min.js"></script>
     <script src="/static/js/lib/bootstrap.min.js"></script>
 
+    <!--Leaflet js-->
+    <script src="https://unpkg.com/leaflet@1.0.3/dist/leaflet.js"
+            integrity="sha512-A7vV8IFfih/D732iSSKi20u/ooOfj/AGehOKq0f4vLT1Zr2Y+RX7C+w8A1gaSasGtRUZpF/NZgzSAu4/Gc41Lg=="
+            crossorigin=""></script>
+
     <!--Controllers-->
     <script src="/static/js/app.js"></script>
 
     <!--StyleSheets-->
-    <link rel="stylesheet" href="/static/css/bootstrap-3.1.1.min.css">
+    <link rel="stylesheet" href="/static/css/lib/bootstrap.css.map">
+    <link rel="stylesheet" href="/static/css/lib/bootstrap-3.1.1.min.css">
+    <link rel="stylesheet" href="/static/css/lib/bootstrap-theme.css.map">
+    <link rel="stylesheet" href="/static/css/lib/bootstrap-theme-3.1.1.css">
+    <link rel="stylesheet" href="/static/css/lib/bootstrap-theme-3.1.1.min.css">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.3/dist/leaflet.css"
+          integrity="sha512-07I2e+7D8p6he1SIM+1twR5TIrhUQn9+I6yjqD53JQjFiMf8EtC93ty0/5vJTZGF8aAocvHYNEDJajGdNx1IsQ=="
+          crossorigin=""/>
 
 
 </head>
 
 <body ng-app="bikeApp">
-<div ng-controller="loginController">
-<!--navbar-->
-<nav class = "navbar navbar-toggleable-md navbar-light" style = "font-size: 20px">
-    <a class="navbar-brand" href="/#/">HackCU</a>
-    <!--before login-->
-    <div class = "collapse navbar-collapse">
-        <ul class = "nav nav-pills pull-right">
-            <li class = "nav-item">
-                <a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
-                    Login <span class="caret"></span>
-                </a>
-                <ul class="dropdown-menu">
-                    <li>
-                        <button type="button" ng-click="login('facebook')">Facebook</button>
-                    </li>
-                    <li>
-                        <a class = "nav-link" href="/#/">Fitbit</a>
+    <div ng-controller="loginController">
+    <!--navbar before login-->
+    <div ng-show = "beforeloginnavbar" class = "ng-show">
+        <nav class = "navbar navbar-toggleable-md navbar-light" style = "font-size: 20px">
+            <a class="navbar-brand" href="/#/">HackCU</a>
+            <div class = "collapse navbar-collapse">
+                <ul class = "nav nav-pills pull-right">
+                    <li class = "nav-item">
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
+                            Login <span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <button type="button" class = "btn" ng-click="login('facebook')">Facebook</button>
+                            </li>
+                            <li>
+                                <button type="button" class = "btn" ng-click="">Fitbit</button>
+                            </li>
+                        </ul>
                     </li>
                 </ul>
-            </li>
-        </ul>
+            </div>
+        </nav>
     </div>
-    <!--after login-->
-    <!--
-    <div class = "collapse navbar-collapse">
-        <ul class = "nav nav-pills pull-right">
-            <li class = "nav-item">
-                <a class = "nav-link" href="/#/">About</a>
-            </li>
-            <li class = "nav-item">
-                <a class = "nav-link" href="/#/">About</a>
-            </li>
-            <li class = "nav-item">
-                <a class = "nav-link" href="/#/">About</a>
-            </li>
-            <li class = "nav-item">
-                <a class = "nav-link" href="/#/">About</a>
-            </li>
-            <li class = "nav-item">
-                <a class = "nav-link" href="/#/">About</a>
-            </li>
-        </ul>
+    <!--navbar after login-->
+    <div ng-show = "afterloginnavbar" class = "ng-show">
+        <nav class = "navbar navbar-toggleable-md navbar-light" style = "font-size: 20px">
+            <a class="navbar-brand" href="/#/">HackCU</a>
+            <div class = "collapse navbar-collapse">
+                <ul class = "nav nav-pills pull-right">
+                    <li class = "nav-item">
+                        <a class = "nav-link" href="/#/directions">Get Directions</a>
+                    </li>
+                    <li class = "nav-item">
+                        <a class = "nav-link" href="/#/">About</a>
+                    </li>
+                    <li class = "nav-item">
+                        <a class = "nav-link" href="/#/">About</a>
+                    </li>
+                    <li class = "nav-item">
+                        <a class = "nav-link" href="/#/">About</a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
     </div>
-    -->
-</nav>
 
-<div ng-view></div>
 
-<hr/>
+    <div ng-view></div>
 
-<!--Footer-->
-<footer class="company">
-    <p><center> &copy; HackCU, 2017.</center></p>
-</footer>
-</div>
+    <hr/>
+
+    <!--Footer-->
+    <footer class="company">
+        <p><center> &copy; HackCU, 2017.</center></p>
+    </footer>
+    </div>
 </body>
 
 </html>

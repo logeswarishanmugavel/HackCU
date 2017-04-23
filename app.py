@@ -56,7 +56,7 @@ def get_route():
     src = 'Boulder, CO'
     dest = 'Denver, CO'
 
-    result = "helo"
+    #result = "helo"
 
     request_body = {
         'locations': [
