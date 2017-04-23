@@ -17,6 +17,8 @@ MAPQUEST_URL = 'http://open.mapquestapi.com/directions/v2/route?key={appkey}'
 MAPQUEST_TRAFFIC_URL='http://www.mapquestapi.com/traffic/v2/incidents?key={appkey}&inFormat=json&outFormat=json'
 MAPQUEST_SEARCH_URL='http://www.mapquestapi.com/search/v2/radius?key={appkey}&inFormat=json&outFormat=json'
 MAPQUEST_GEOCODE_URL='http://www.mapquestapi.com/geocoding/v1/address?key=KEY'
+LAST_FM_URL = 'http://ws.audioscrobbler.com/2.0/'
+LAST_FM_API_KEY='0ad76dcbcab2f1592d502f1961ecf9e7'
 
 # ----------------------------------------------------------------------------#
 # App Config.
@@ -242,6 +244,14 @@ def get_route(src, dest):
     return json.dumps(final_result)
 
 # result['route']['legs'][0]['maneuvers']
+
+
+@app.route('/getSongs/<country>/<location>')
+def get_songs(country, location):
+    params = {'method': 'geo.gettoptracks', 'country': country, 'location': location, 'api_key': LAST_FM_API_KEY,
+              'format': 'json'}
+    r = requests.get(LAST_FM_URL, params=params)
+    return jsonify(result=json.loads(r.content))
 
 
 def get_lat_long_route(result):
