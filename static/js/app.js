@@ -68,7 +68,7 @@ bikeApp.config(['$routeProvider','$locationProvider',
     }]);
 
 bikeApp.controller('loginController',[
-    '$scope','$http','facebook', function ($scope,$http,facebook) {
+    '$scope','$http','$route','facebook', function ($scope,$http,$route,facebook) {
         var user_id = '';
         var loginstatus = false;
         var fb_id = '';
@@ -102,6 +102,7 @@ bikeApp.controller('loginController',[
         }
         $scope.onpageload = function(){
                  facebook.checkLogin(function (response){
+                        console.log(response);
                         if(response.status ==='connected'){
                             loginstatus = true;
                             $scope.loginform = false;
@@ -153,13 +154,15 @@ bikeApp.controller('loginController',[
                     };
                     console.log (req);
                     $http(req).then(function (resp) {
-                        console.log(resp);
+                        loginstatus = true;
                         $scope.loginform = false;
+                        $scope.mysavedroutes = true;
                         $http({
                         	method: 'GET',
                         	url: '/getuserid/'+re_details["fb_id"]
                         }).then(function(response) {
-                            console.log(response);
+                            user_id = response.data.user_id;
+                            getuserinfo(user_id);
                         }, function(error) {
                           	console.log(error);
                         });
@@ -190,7 +193,10 @@ bikeApp.controller('loginController',[
         $scope.logout = function () {
             facebook.logout(function (response) {
                 console.log(response);
-                $scope.login = true;
+                $scope.loginform = true;
+                $scope.mysavedroutes = false;
+                loginstatus = false;
+                $route.reload();
             });
         }
         /*

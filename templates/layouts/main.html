@@ -35,7 +35,7 @@
 
 </head>
 
-<body ng-app="bikeApp" ng-controller="loginController">
+<body ng-app="bikeApp" ng-controller="loginController" style="font-size:23px;">
     <!--navbar after login-->
         <nav class = "navbar navbar-default navbar-light" role = "navigation">
             <div class = "container-fluid">
@@ -49,6 +49,11 @@
                         </li>
                         <li class = "nav-item">
                             <a class = "nav-link" href="/#/friends">Friends</a>
+                        </li>
+                    </ul>
+                    <ul class = "nav navbar pull-right">
+                        <li class = "nav-item">
+                            <button class = "btn btn-lg btn-primary btn-block" ng-click="logout('facebook')">Logout</button>
                         </li>
                     </ul>
                 </div>
