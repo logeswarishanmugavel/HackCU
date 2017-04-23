@@ -1,7 +1,7 @@
 <hr/>
 <!--carousel-->
-<div ng-controller="loginController" style = "font-size:20px">
-    <div ng-show="login" class="ng-show container" id="loginbox">
+<div ng-controller="loginController" ng-init = "onpageload()" style = "font-size:20px">
+    <div ng-show="loginform" class="ng-show container" id="loginbox">
         <form class = "form-signin">
             <h2>Authorize using Facebook</h2>
             <div class="social-buttons">
@@ -21,7 +21,7 @@
             </div>
         </div>
         <div>
-            <a href="#/get"
+
         </div>
     </div>
 </div>

@@ -37,9 +37,9 @@ bikeApp.factory('facebook', ['$window', function($window) {
         },
         details: function (callback) {
             FB.api("/me",{fields: 'email,gender,name,age_range'},callback);
-        }
-        checkLogin: function(){
-            return FB.getLoginStatus();
+        },
+        checkLogin: function(callback){
+            FB.getLoginStatus(callback);
         }
 
     }
@@ -66,8 +66,37 @@ bikeApp.config(['$routeProvider','$locationProvider',
 bikeApp.controller('loginController',[
     '$scope','$http','facebook', function ($scope,$http,facebook) {
         var userid = '';
+        var loginstatus = false;
+        var fb_id = '';
+        $scope.onpageload = function(){
+                 facebook.checkLogin(function (response){
+                        console.log(response);
+                        if(response.status ==='connected'){
+                            loginstatus = true;
+                            $scope.loginform = false;
+                            $scope.mysavedroutes = true;
+                            fb_id = response.authResponse.userID;
+                            facebook.details(function (details){
+                                $scope.loginform = false;
+                                $http({
+                                       method: 'GET',
+                                       url: '/getuserid/'+fb_id
+                                }).then(function(response) {
+                                       console.log(response);
+                                }, function(error) {
+                                       console.log(error);
+                                });
+                            });
+                        }
+                        else{
+                            loginstatus = false;
+                            $scope.loginform = true;
+                            $scope.mysavedroutes = false;
+                        }
+                    });
+        }
         $scope.login = function () {
-            if(!facebook.checkLogin()){
+            if(!loginstatus){
             facebook.login(function (loginData) {
                 facebook.details(function (details) {
                     var re_details = {};
@@ -87,16 +116,33 @@ bikeApp.controller('loginController',[
                     console.log (req);
                     $http(req).then(function (resp) {
                         console.log(resp);
-                        $scope.login = false;
+                        $scope.loginform = false;
+                        $http({
+                        	method: 'GET',
+                        	url: '/getuserid/'+re_details["fb_id"]
+                        }).then(function(response) {
+                            console.log(response);
+                        }, function(error) {
+                          	console.log(error);
+                        });
                     });
                 });
             });
+
             }else{
                 facebook.details(function (details){
-
+                    $scope.loginform = false;
+                    $http({
+                           method: 'GET',
+                           url: '/getuserid/'+fb_id
+                    }).then(function(response) {
+                           console.log(response);
+                    }, function(error) {
+                           console.log(error);
+                    });
                 });
             }
-        };
+        }
         $scope.logout = function () {
             facebook.logout(function (response) {
                 console.log(response);
