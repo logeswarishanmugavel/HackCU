@@ -38,6 +38,9 @@ bikeApp.factory('facebook', ['$window', function($window) {
         details: function (callback) {
             FB.api("/me",{fields: 'email,gender,name,age_range'},callback);
         }
+        checkLogin: function(){
+            return FB.getLoginStatus();
+        }
 
     }
 }]);
@@ -46,7 +49,8 @@ bikeApp.config(['$routeProvider','$locationProvider',
      function($routeProvider,$locationProvider) {
          $routeProvider.
              when('/', {
-                 templateUrl: '/static/pages/welcome.html'
+                 templateUrl: '/static/pages/welcome.html',
+                 controller: 'loginController'
              }).
              when('/directions', {
                  templateUrl: '/static/pages/directions.html',
@@ -61,12 +65,10 @@ bikeApp.config(['$routeProvider','$locationProvider',
 
 bikeApp.controller('loginController',[
     '$scope','$http','facebook', function ($scope,$http,facebook) {
-        $scope.beforeloginnavbar = true;
-        $scope.afterloginnavbar = false;
+        var userid = '';
         $scope.login = function () {
+            if(!facebook.checkLogin()){
             facebook.login(function (loginData) {
-                $scope.beforeloginnavbar = false;
-                $scope.afterloginnavbar = true;
                 facebook.details(function (details) {
                     var re_details = {};
                     re_details["name"] = details["name"];
@@ -85,15 +87,20 @@ bikeApp.controller('loginController',[
                     console.log (req);
                     $http(req).then(function (resp) {
                         console.log(resp);
+                        $scope.login = false;
                     });
                 });
             });
+            }else{
+                facebook.details(function (details){
+
+                });
+            }
         };
         $scope.logout = function () {
             facebook.logout(function (response) {
                 console.log(response);
-                $scope.beforeloginnavbar = true;
-                $scope.afterloginnavbar = false;
+                $scope.login = true;
             });
         }
     }

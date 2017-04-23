@@ -1,5 +1,27 @@
 <hr/>
 <!--carousel-->
 <div ng-controller="loginController" style = "font-size:20px">
+    <div ng-show="login" class="ng-show container" id="loginbox">
+        <form class = "form-signin">
+            <h2>Authorize using Facebook</h2>
+            <div class="social-buttons">
+                <button class = "btn btn-lg btn-primary btn-block" ng-click="login('facebook')"><i class="fa fa-facebook"></i>Facebook</button>
+            </div>
+        </form>
+    </div>
 
+    <!-- Page Heading/Breadcrumbs -->
+    <div ng-show="mysavedroutes" class="ng-show container-fluid">
+        <div class="row">
+            <div class="col-lg-12">
+                <h1 class="page-header">My Saved Routes</h1>
+                <ol class="breadcrumb">
+                    <li><a href="/#/">Home</a>
+                </ol>
+            </div>
+        </div>
+        <div>
+            <a href="#/get"
+        </div>
+    </div>
 </div>
