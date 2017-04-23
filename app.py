@@ -89,7 +89,7 @@ def addrouteinfo():
     except ValueError:
         print "a data format exception occurred"
     db_session.commit()
-    return "route info added"
+    return jsonify(route_id=ri.route_id)
 
 
 @app.route('/adduserrouteinfo', methods=['POST'])
@@ -97,14 +97,15 @@ def adduserrouteinfo():
     user_route_info = json.loads(request.data)
     uris = UserRouteInfoSchema()
     try:
-        user_route_info['trip_date'] = datetime.datetime.strptime(user_route_info['trip_date'], "%m/%d/%y").isoformat()
         uri = uris.load(user_route_info, session=db_session, partial=True).data
+        user_route_info['trip_date'] = datetime.datetime.strptime(user_route_info['trip_date'], "%m/%d/%y")
         uri.user_id = user_route_info['user_id']
         uri.route_id = user_route_info['route_id']
         db_session.add(uri)
     except ValueError:
         print "a data format exception occurred"
     db_session.commit()
+    return "userroute added"
 
 
 @app.route('/getuserinfo/<user_id>')
@@ -246,7 +247,7 @@ def get_route(src, dest):
             }
         }
         r_poi = requests.post(MAPQUEST_URL.format(appkey=API_KEY), data=json.dumps(request_body))
-        print r_poi.content
+       # print r_poi.content
 
     final_result = {'boundingBox': bounding_box, 'narratives': narrative_list, 'lat_long': lat_long_list, 'traffic': traffic_info, 'weather': weather_conditions}
     return json.dumps(final_result)

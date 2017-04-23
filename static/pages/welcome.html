@@ -1,5 +1,4 @@
 <hr/>
-<!--carousel-->
 <div ng-controller="loginController" ng-init = "onpageload()" style = "font-size:20px">
     <div ng-show="loginform" class="ng-show container" id="loginbox">
         <form class = "form-signin">
@@ -17,11 +16,23 @@
                 <h1 class="page-header">My Saved Routes</h1>
                 <ol class="breadcrumb">
                     <li><a href="/#/">Home</a>
+                    <li class="active">Saved Routes</li>
                 </ol>
             </div>
         </div>
-        <div>
-
+        <div class = "row">
+            <div class = "col-xs-4 container">
+                <div ng-Repeat = "route in routeinfo">
+                    <br/>
+                    <center>
+                        <button class = "btn btn-lg btn-primary" ng-click="savedroutes(route.route_info.info)"> Route {{ route.info_id }}</button>
+                    </center>
+                </div>
+            </div>
+            <div class = "col-xs-8">
+                <div id="map"></div>
+            </div>
         </div>
+
     </div>
 </div>

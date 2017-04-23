@@ -54,8 +54,12 @@ bikeApp.config(['$routeProvider','$locationProvider',
              }).
              when('/directions', {
                  templateUrl: '/static/pages/directions.html',
-                 controller: 'RouteController'
+                 controller: 'loginController'
              }).
+             when('/friends', {
+                  templateUrl: '/static/pages/friends.html',
+                  controller: 'loginController'
+              }).
              otherwise({
                  redirectTo: '/'
              });
@@ -65,12 +69,32 @@ bikeApp.config(['$routeProvider','$locationProvider',
 
 bikeApp.controller('loginController',[
     '$scope','$http','facebook', function ($scope,$http,facebook) {
-        var userid = '';
+        var user_id = '';
         var loginstatus = false;
         var fb_id = '';
+        $scope.routeinfo = [];
+        $scope.friendslist = [];
+        var getuserinfo = function(user_id){
+            $http({
+                      method: 'GET',
+                      url: '/getuserinfo/'+user_id
+               }).then(function(response) {
+                    console.log(response.data);
+                    $scope.routeinfo = response.data.result.route_list;
+                    $scope.friendslist = response.data.result.friends_list;
+               });
+        }
+        var getfriendsinfo = function(friend_id){
+            $http({
+                      method: 'GET',
+                      url: '/getuserinfo/'+friend_id
+               }).then(function(response) {
+                    console.log(response.data);
+                    //$scope.routeinfo = response.data.result.route_list;
+               });
+        }
         $scope.onpageload = function(){
                  facebook.checkLogin(function (response){
-                        console.log(response);
                         if(response.status ==='connected'){
                             loginstatus = true;
                             $scope.loginform = false;
@@ -82,7 +106,8 @@ bikeApp.controller('loginController',[
                                        method: 'GET',
                                        url: '/getuserid/'+fb_id
                                 }).then(function(response) {
-                                       console.log(response);
+                                       user_id = response.data.user_id;
+                                       getuserinfo(user_id);
                                 }, function(error) {
                                        console.log(error);
                                 });
@@ -94,6 +119,11 @@ bikeApp.controller('loginController',[
                             $scope.mysavedroutes = false;
                         }
                     });
+        }
+        $scope.getfrienddetails = function(){
+            for(i=0;i<$scope.friendslist.length;i++){
+                console.log("Hello");
+            }
         }
         $scope.login = function () {
             if(!loginstatus){
@@ -143,50 +173,151 @@ bikeApp.controller('loginController',[
                 });
             }
         }
+
+        $scope.friendslist = function () {
+            facebook.friendslist(function(response){
+                console.log(response);
+            });
+        }
         $scope.logout = function () {
             facebook.logout(function (response) {
                 console.log(response);
                 $scope.login = true;
             });
         }
+        /*
     }
 ]);
 
-bikeApp.controller('RouteController', function($scope, $http) {
-    var map;
+bikeApp.controller('RouteController',['$scope','$http','facebook', function ($scope,$http,facebook) {
+*/
+
     $scope.narratives = [];
-    $scope.distance = 0;
-    $scope.time = 0;
+    var directionresponsedata = undefined;
+    var loginstatus = false;
+    var fb_id,user_id;
+    $scope.savebutton = false;
+    $scope.successmsg = false;
+    /*$scope.onpageload = function(){
+         facebook.checkLogin(function (response){
+                console.log(response);
+                if(response.status ==='connected'){
+                    loginstatus = true;
+                    fb_id = response.authResponse.userID;
+                    facebook.details(function (details){
+                        $scope.loginform = false;
+                        $http({
+                               method: 'GET',
+                               url: '/getuserid/'+fb_id
+                        }).then(function(response) {
+                               user_id = response.data.user_id;
+                        }, function(error) {
+                               console.log(error);
+                        });
+                    });
+                }
+                else{
+                    loginstatus = false;
+                }
+            });
+    }*/
+    var map;
+    var plotmap = function(waypoints){
+        if(map){
+            map.remove();
+        }
+        map = L.map('map', {
+            layers: MQ.mapLayer(),
+            dragging: true
+        });
+        console.log(waypoints);
+        var control = L.Routing.control({
+             waypoints: waypoints,
+             draggableWaypoints: false,
+             show: false,
+             createMarker: function(i,waypoints,n){
+                if(i==0||i==n-1)
+                    return L.marker(waypoints.latLng);
+               }
+        }).addTo(map);
+    }
+
+    $scope.savedroutes = function(data){
+
+
+        var pdata = JSON.parse(data);
+        console.log(pdata);
+        plotmap(pdata);
+    }
 
     $scope.getdirections = function(){
-            if(map)
-                map.remove();
-                    var src = $scope.route.source;
-                    var dest = $scope.route.destination;
-                    map = L.map('map', {
-                        layers: MQ.mapLayer(),
-                        dragging: true
-                      });
+            var src = $scope.route.source;
+            var dest = $scope.route.destination;
+            $http({
+                method: 'GET',
+                url: '/getDirections/'+src+"/"+dest
+            }).then(function(response) {
+                console.log(response);
+                $scope.narratives = response.data.narratives;
+                directionresponsedata = response.data.lat_long;
+                $scope.savebutton = true;
+                plotmap(directionresponsedata);
+            }, function(error) {
+                console.log(error);
+            });
 
+    }
 
-					$http({
-						method: 'GET',
-						url: '/getDirections/'+src+"/"+dest
-					}).then(function(response) {
-					    console.log(response);
-					    $scope.narratives = response.data.narratives;
-					    var control = L.Routing.control({
-                                             waypoints: response.data.lat_long,
-                                             draggableWaypoints: false,
-                                             show: false,
-                                             createMarker: function(i,waypoints,n){
-                                                if(i==0||i==n-1)
-                                                    return L.marker(waypoints.latLng);
-                                               }
-                                           }).addTo(map);
-					}, function(error) {
-						console.log(error);
-					});
+    $scope.saveRoute = function(){
+        var data = {};
+        data["from_lat"] = directionresponsedata[0]["lat"];
+        data["from_lng"] = directionresponsedata[0]["lng"];
+        data["to_lat"] = directionresponsedata[length-1]["lat"];
+        data["to_lng"] = directionresponsedata[length-1]["lng"];
+        data["info"] = JSON.stringify(directionresponsedata);
 
-	}
-});
+        console.log(data);
+        $http({
+            method: 'POST',
+            url: '/addrouteinfo',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            data: data
+        }).then(function(response) {
+                console.log(response);
+                var userroutedata = {};
+                var today = new Date();
+                var dd = today.getDate();
+                var mm = today.getMonth()+1;
+                var yy = today.getFullYear().toString().substr(2,2);
+                if(dd<10){
+                    dd='0'+dd;
+                }
+                if(mm<10){
+                    mm='0'+mm;
+                }
+                var today = mm+'/'+dd+'/'+yy;
+                userroutedata["user_id"]=user_id;
+                userroutedata["trip_date"] = today;
+                userroutedata["route_id"] = response["data"]["route_id"];
+                //userroutedata["route_info"] = '';
+
+                     $http({
+                           method: 'POST',
+                           url: '/adduserrouteinfo',
+                           headers: {
+                               'Content-Type': 'application/json'
+                           },
+                           data: userroutedata
+                       }).then(function(response) {
+                            console.log(response);
+                        }, function(error) {
+                         console.log(error);
+                     });
+
+        }, function(error) {
+                         console.log(error);
+                     });
+    }
+}]);
