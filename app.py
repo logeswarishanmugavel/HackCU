@@ -2,14 +2,11 @@
 # Imports
 # ----------------------------------------------------------------------------#
 
-from flask import Flask, render_template, jsonify
-from models import db_session
+from flask import Flask, render_template, jsonify, request
+from models import db_session, UserInfo, FriendsList, RouteInfo, UserRouteInfo, UserInfoSchema, FriendsListSchema, RouteInfoSchema, UserRouteInfoSchema
 import json
 import requests
-
-from pprint import pprint
-
-
+import datetime
 
 API_KEY = 'ToZQl1qWNAYdhWRtGKocMb4tG9vEQa7g'
 MAPQUEST_URL = 'http://open.mapquestapi.com/directions/v2/route?key={appkey}'
@@ -44,6 +41,69 @@ def about():
     return render_template('pages/placeholder.about.html')
     '''
 
+
+@app.route('/adduser', methods=['POST'])
+def adduser():
+    user_info = json.loads(request.data)
+    uis = UserInfoSchema()
+    try:
+        ui = uis.load(user_info, session=db_session, partial=True).data
+        db_session.add(ui)
+    except ValueError:
+        print "a data format exception occurred"
+    db_session.commit()
+    return "User Added"
+
+
+@app.route('/addfriends/<user_id>', methods=['POST'])
+def addfriends(user_id):
+    friends_ids = [x.strip() for x in request.data.split(',')]
+    fls = FriendsListSchema()
+    friend_info = {'user_id': '', 'friend_id': ''}
+    for friend_id in friends_ids:
+        try:
+            fl = fls.load(friend_info, session=db_session, partial=True).data
+            fl.user_id = int(user_id)
+            fl.friend_id = int(friend_id)
+            db_session.add(fl)
+        except ValueError:
+            print "a data format exception occurred"
+    db_session.commit()
+
+
+@app.route('/addrouteinfo', methods=['POST'])
+def addrouteinfo():
+    route_info = json.loads(request.data)
+    ris = RouteInfoSchema()
+    try:
+        ri = ris.load(route_info, session=db_session, partial=True).data
+        db_session.add(ri)
+    except ValueError:
+        print "a data format exception occurred"
+    db_session.commit()
+    return "route info added"
+
+
+@app.route('/adduserrouteinfo', methods=['POST'])
+def adduserrouteinfo():
+    user_route_info = json.loads(request.data)
+    uris = UserRouteInfoSchema()
+    try:
+        user_route_info['trip_date'] = datetime.datetime.strptime(user_route_info['trip_date'], "%m/%d/%y").isoformat()
+        uri = uris.load(user_route_info, session=db_session, partial=True).data
+        uri.user_id = user_route_info['user_id']
+        uri.route_id = user_route_info['route_id']
+        db_session.add(uri)
+    except ValueError:
+        print "a data format exception occurred"
+    db_session.commit()
+
+
+@app.route('/getuserinfo/<user_id>')
+def getuserinfo(user_id):
+    result = UserInfo().query.filter(UserInfo.user_id == user_id).first()
+    ui_json = UserInfoSchema().dump(result).data
+    return jsonify(result=ui_json)
 
 
 @app.route('/getdirections')
