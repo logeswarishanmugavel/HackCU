@@ -110,6 +110,14 @@ def getuserinfo(user_id):
     ui_json = UserInfoSchema().dump(result).data
     return jsonify(result=ui_json)
 
+
+@app.route('/getuserid/<fb_id>')
+def getuserid(fb_id):
+    result = UserInfo().query.filter(UserInfo.fb_id == fb_id).first()
+    ui_json = UserInfoSchema().dump(result).data
+    return jsonify(user_id=ui_json['user_id'])
+
+
 def get_weather_conditions(bounding_box):
 
     lat1 = bounding_box['ul']['lat']
