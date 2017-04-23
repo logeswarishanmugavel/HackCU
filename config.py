@@ -16,4 +16,4 @@ SECRET_KEY = 'my precious'
 
 # Connect to the database
 
-SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://root:loki123@localhost:3306/hackcu'
+SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://root:root@localhost:3306/hackcu'

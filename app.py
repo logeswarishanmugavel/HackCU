@@ -159,8 +159,8 @@ def get_route(src, dest):
 
     traffic_info = get_traffic_info(bounding_box)
 
-    final_result = {'narratives': narrative_list,'lat_long':lat_long_list,'traffic':traffic_info,'weather':weather_conditions}
-    return json.dumps(result)
+    final_result = {'boundingBox':bounding_box,'narratives': narrative_list,'lat_long':lat_long_list,'traffic':traffic_info,'weather':weather_conditions}
+    return json.dumps(final_result)
 
 # result['route']['legs'][0]['maneuvers']
 def get_lat_long_route(result):
