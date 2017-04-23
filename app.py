@@ -17,6 +17,8 @@ MAPQUEST_URL = 'http://open.mapquestapi.com/directions/v2/route?key={appkey}'
 MAPQUEST_TRAFFIC_URL='http://www.mapquestapi.com/traffic/v2/incidents?key={appkey}&inFormat=json&outFormat=json'
 MAPQUEST_SEARCH_URL='http://www.mapquestapi.com/search/v2/radius?key={appkey}&inFormat=json&outFormat=json'
 MAPQUEST_GEOCODE_URL='http://www.mapquestapi.com/geocoding/v1/address?key=KEY'
+LAST_FM_URL = 'http://ws.audioscrobbler.com/2.0/'
+LAST_FM_API_KEY='0ad76dcbcab2f1592d502f1961ecf9e7'
 
 ATTRACTIVE_SIC_CODES = [999333,902209,903005,901027,901006,901010,901014,901023,842201,841206,829950,806202,806203,809916,
                        799954,799940,799729,799701,735922,703301,703208,702103,701107,701106,581228,554101,541103,541101
@@ -113,6 +115,14 @@ def getuserinfo(user_id):
     result = UserInfo().query.filter(UserInfo.user_id == user_id).first()
     ui_json = UserInfoSchema().dump(result).data
     return jsonify(result=ui_json)
+
+
+@app.route('/getuserid/<fb_id>')
+def getuserid(fb_id):
+    result = UserInfo().query.filter(UserInfo.fb_id == fb_id).first()
+    ui_json = UserInfoSchema().dump(result).data
+    return jsonify(user_id=ui_json['user_id'])
+
 
 def get_weather_conditions(bounding_box):
 
@@ -256,6 +266,14 @@ def get_route(src, dest):
     return json.dumps(final_result)
 
 # result['route']['legs'][0]['maneuvers']
+
+
+@app.route('/getSongs/<country>/<location>')
+def get_songs(country, location):
+    params = {'method': 'geo.gettoptracks', 'country': country, 'location': location, 'api_key': LAST_FM_API_KEY,
+              'format': 'json'}
+    r = requests.get(LAST_FM_URL, params=params)
+    return jsonify(result=json.loads(r.content))
 
 
 def get_lat_long_route(result):

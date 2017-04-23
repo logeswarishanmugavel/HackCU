@@ -38,6 +38,9 @@ bikeApp.factory('facebook', ['$window', function($window) {
         details: function (callback) {
             FB.api("/me",{fields: 'email,gender,name,age_range'},callback);
         }
+        checkLogin: function(){
+            return FB.getLoginStatus();
+        }
 
     }
 }]);
@@ -46,7 +49,8 @@ bikeApp.config(['$routeProvider','$locationProvider',
      function($routeProvider,$locationProvider) {
          $routeProvider.
              when('/', {
-                 templateUrl: '/static/pages/welcome.html'
+                 templateUrl: '/static/pages/welcome.html',
+                 controller: 'loginController'
              }).
              when('/directions', {
                  templateUrl: '/static/pages/directions.html',
@@ -61,12 +65,10 @@ bikeApp.config(['$routeProvider','$locationProvider',
 
 bikeApp.controller('loginController',[
     '$scope','$http','facebook', function ($scope,$http,facebook) {
-        $scope.beforeloginnavbar = true;
-        $scope.afterloginnavbar = false;
+        var userid = '';
         $scope.login = function () {
+            if(!facebook.checkLogin()){
             facebook.login(function (loginData) {
-                $scope.beforeloginnavbar = false;
-                $scope.afterloginnavbar = true;
                 facebook.details(function (details) {
                     var re_details = {};
                     re_details["name"] = details["name"];
@@ -85,52 +87,40 @@ bikeApp.controller('loginController',[
                     console.log (req);
                     $http(req).then(function (resp) {
                         console.log(resp);
+                        $scope.login = false;
                     });
                 });
             });
+            }else{
+                facebook.details(function (details){
+
+                });
+            }
         };
         $scope.logout = function () {
             facebook.logout(function (response) {
                 console.log(response);
-                $scope.beforeloginnavbar = true;
-                $scope.afterloginnavbar = false;
+                $scope.login = true;
             });
         }
     }
 ]);
 
 bikeApp.controller('RouteController', function($scope, $http) {
-    //var map;
-    $scope.directions = [
-    {"lng": -77.077957,"lat": 38.893165},
-    {"lng": -77.077407,"lat": 38.893276},
-    {"lng": -77.077087,"lat": 38.890857},
-    {"lng": -77.077148,"lat": 38.890842},
-    {"lng": -77.089424,"lat": 38.87355},
-    {"lng": -77.088119,"lat": 38.867782},
-    {"lng": -77.088584,"lat": 38.855186},
-    {"lng": -77.08123,"lat": 38.848926}
-    ];
-
-    $scope.mapinit = function() {
-          // map.off();
-    }
+    var map;
+    $scope.narratives = [];
+    $scope.distance = 0;
+    $scope.time = 0;
 
     $scope.getdirections = function(){
+            if(map)
+                map.remove();
                     var src = $scope.route.source;
                     var dest = $scope.route.destination;
-                    var map = L.map('map', {
+                    map = L.map('map', {
                         layers: MQ.mapLayer(),
-                        zoom: 12
+                        dragging: true
                       });
-
-                   //var marker = L.marker([51.5, -0.09]).addTo(map);
-                   var control = L.Routing.control({
-                     waypoints: $scope.directions,
-                     show: true,
-                     waypointMode: 'snap',
-                     createMarker: function() {}
-                   }).addTo(map);
 
 
 					$http({
@@ -138,6 +128,16 @@ bikeApp.controller('RouteController', function($scope, $http) {
 						url: '/getDirections/'+src+"/"+dest
 					}).then(function(response) {
 					    console.log(response);
+					    $scope.narratives = response.data.narratives;
+					    var control = L.Routing.control({
+                                             waypoints: response.data.lat_long,
+                                             draggableWaypoints: false,
+                                             show: false,
+                                             createMarker: function(i,waypoints,n){
+                                                if(i==0||i==n-1)
+                                                    return L.marker(waypoints.latLng);
+                                               }
+                                           }).addTo(map);
 					}, function(error) {
 						console.log(error);
 					});
