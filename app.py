@@ -20,6 +20,9 @@ MAPQUEST_GEOCODE_URL='http://www.mapquestapi.com/geocoding/v1/address?key=KEY'
 LAST_FM_URL = 'http://ws.audioscrobbler.com/2.0/'
 LAST_FM_API_KEY='0ad76dcbcab2f1592d502f1961ecf9e7'
 
+ATTRACTIVE_SIC_CODES = [999333,902209,903005,901027,901006,901010,901014,901023,842201,841206,829950,806202,806203,809916,
+                       799954,799940,799729,799701,735922,703301,703208,702103,701107,701106,581228,554101,541103,541101
+                        ,472401,411906,411902,97106,19101]
 # ----------------------------------------------------------------------------#
 # App Config.
 # ----------------------------------------------------------------------------#
@@ -89,7 +92,7 @@ def addrouteinfo():
     except ValueError:
         print "a data format exception occurred"
     db_session.commit()
-    return jsonify(route_id=ri.route_id)
+    return "route info added"
 
 
 @app.route('/adduserrouteinfo', methods=['POST'])
@@ -97,8 +100,8 @@ def adduserrouteinfo():
     user_route_info = json.loads(request.data)
     uris = UserRouteInfoSchema()
     try:
+        user_route_info['trip_date'] = datetime.datetime.strptime(user_route_info['trip_date'], "%m/%d/%y").isoformat()
         uri = uris.load(user_route_info, session=db_session, partial=True).data
-        user_route_info['trip_date'] = datetime.datetime.strptime(user_route_info['trip_date'], "%m/%d/%y")
         uri.user_id = user_route_info['user_id']
         uri.route_id = user_route_info['route_id']
         db_session.add(uri)
@@ -195,6 +198,8 @@ def get_route(src, dest):
     ## TODO: add from user request.
     src = unquote_plus(src)
     dest = unquote_plus(dest)
+    sic_code = 13901
+    nearby_attractions_search = []
 
     request_body = {
         'locations': [
@@ -236,7 +241,7 @@ def get_route(src, dest):
     traffic_info = get_traffic_info(bounding_box)
 
     for ll in lat_long_list:
-        request_body = {
+        request_body_temp = {
             "origin": {
                 "latLng": ll
             },
@@ -246,10 +251,19 @@ def get_route(src, dest):
                 "units": "m"
             }
         }
-        r_poi = requests.post(MAPQUEST_URL.format(appkey=API_KEY), data=json.dumps(request_body))
-       # print r_poi.content
+        r_poi = requests.post(MAPQUEST_SEARCH_URL.format(appkey=API_KEY), data=json.dumps(request_body_temp))
+        search_result = json.loads(r_poi.content)
+        search_length = len(search_result['searchResults'])
+        for i in range(search_length):
+            try:
+                sic_code = int(search_result['searchResults'][0]['fields']['group_sic_code'])
+            except ValueError:
+                sic_code = 13901
 
-    final_result = {'boundingBox': bounding_box, 'narratives': narrative_list, 'lat_long': lat_long_list, 'traffic': traffic_info, 'weather': weather_conditions}
+            if sic_code in ATTRACTIVE_SIC_CODES:
+                nearby_attractions_search.append(search_result['searchResults'][i])
+
+    final_result = {'boundingBox': bounding_box, 'narratives': narrative_list, 'lat_long': lat_long_list, 'traffic': traffic_info, 'weather': weather_conditions,'nearbyAttractions':nearby_attractions_search}
     return json.dumps(final_result)
 
 # result['route']['legs'][0]['maneuvers']
@@ -257,10 +271,16 @@ def get_route(src, dest):
 
 @app.route('/getSongs/<country>/<location>')
 def get_songs(country, location):
+    url_list = []
     params = {'method': 'geo.gettoptracks', 'country': country, 'location': location, 'api_key': LAST_FM_API_KEY,
               'format': 'json'}
     r = requests.get(LAST_FM_URL, params=params)
-    return jsonify(result=json.loads(r.content))
+    content = json.loads(r.content)
+    for i in range(len(content['tracks']['track'])):
+        url_list.append(str(content['tracks']['track'][i]['url']))
+
+    songs_url = {'links': url_list}
+    return jsonify(result=songs_url)
 
 
 def get_lat_long_route(result):
