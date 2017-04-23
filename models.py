@@ -6,7 +6,7 @@ from sqlalchemy import Column, Integer, String, Float, Date, Boolean
 from marshmallow_sqlalchemy import ModelSchema
 from marshmallow import fields
 
-engine = create_engine('mysql+pymysql://root:loki123@localhost:3306/hackcu?charset=utf8', echo=False)
+engine = create_engine('mysql+pymysql://root:root@localhost:3306/hackcu', echo=False)
 db_session = scoped_session(sessionmaker(autocommit=False,
                                          autoflush=False,
                                          bind=engine))
@@ -42,7 +42,6 @@ class FriendsList(Base):
         return "<FriendsList: " + str(self.user_id) + "," + str(self.friend_id) + ">"
 
 
-
 class RouteInfo(Base):
     __tablename__ = 'RouteInfo'
 
@@ -51,7 +50,7 @@ class RouteInfo(Base):
     from_lng = Column(Float)
     to_lat = Column(Float)
     to_lng = Column(Float)
-    info = Column(String(50000))
+    info = Column(String(10000))
 
     def __repr__(self):
         return "<RouteInfo: " + str(self.from_lat) + " " + str(self.from_lng) + "," + str(self.to_lat) + " " + str(self.to_lng) + ">"
@@ -89,8 +88,7 @@ class RouteInfoSchema(ModelSchema):
 
 class UserRouteInfoSchema(ModelSchema):
     class Meta:
-        model = UserRouteInfo
-        #fields = ['trip_date', 'route_id', 'route_info']
+        fields = ['trip_date', 'route_id', 'route_info']
     route_info = fields.Nested("RouteInfoSchema")
 
 
