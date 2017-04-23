@@ -8,6 +8,7 @@ import json
 import requests
 import datetime
 from pprint import pprint
+from urllib import unquote_plus
 
 WEATHER_URL = 'http://api.openweathermap.org/data/2.5/box/city?bbox={lat1},{long1},{lat2},{long2},{zoom}&appid={appkey}'
 WEATHER_API_KEY = '2feb61047e2d1f0763874018ff395415'
@@ -55,7 +56,7 @@ def adduser():
         ui = uis.load(user_info, session=db_session, partial=True).data
         db_session.add(ui)
     except ValueError:
-        print "a data format exception occurred"
+        return "a data format exception occurred"
     db_session.commit()
     return "User Added"
 
@@ -181,7 +182,8 @@ def get_route(src, dest):
     ## get route information along with traffic information.
 
     ## TODO: add from user request.
-
+    src = unquote_plus(src)
+    dest = unquote_plus(dest)
 
     request_body = {
         'locations': [
@@ -222,10 +224,26 @@ def get_route(src, dest):
 
     traffic_info = get_traffic_info(bounding_box)
 
-    final_result = {'boundingBox':bounding_box,'narratives': narrative_list,'lat_long':lat_long_list,'traffic':traffic_info,'weather':weather_conditions}
+    for ll in lat_long_list:
+        request_body = {
+            "origin": {
+                "latLng": ll
+            },
+            "options": {
+                "radius": 20,
+                "maxMatches": 10,
+                "units": "m"
+            }
+        }
+        r_poi = requests.post(MAPQUEST_URL.format(appkey=API_KEY), data=json.dumps(request_body))
+        print r_poi.content
+
+    final_result = {'boundingBox': bounding_box, 'narratives': narrative_list, 'lat_long': lat_long_list, 'traffic': traffic_info, 'weather': weather_conditions}
     return json.dumps(final_result)
 
 # result['route']['legs'][0]['maneuvers']
+
+
 def get_lat_long_route(result):
 
     narrative_list = []

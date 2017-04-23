@@ -60,19 +60,33 @@ bikeApp.config(['$routeProvider','$locationProvider',
     }]);
 
 bikeApp.controller('loginController',[
-    '$scope','facebook', function ($scope,facebook) {
+    '$scope','$http','facebook', function ($scope,$http,facebook) {
         $scope.beforeloginnavbar = true;
         $scope.afterloginnavbar = false;
         $scope.login = function () {
-            facebook.login(function (data) {
-                console.log(data);
+            facebook.login(function (loginData) {
                 $scope.beforeloginnavbar = false;
                 $scope.afterloginnavbar = true;
-            });
-        };
-        $scope.getDetails = function () {
-            facebook.details(function (data) {
-                console.log(data);
+                facebook.details(function (details) {
+                    var re_details = {};
+                    re_details["name"] = details["name"];
+                    re_details["age"] = parseInt(details["age_range"]["min"]);
+                    re_details["gender"]  = details["gender"];
+                    re_details["email_id"] = details["email"];
+                    re_details["fb_id"] = details["id"];
+                    var req = {
+                        method: 'POST',
+                        url: '/adduser',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        data: JSON.stringify(re_details)
+                    };
+                    console.log (req);
+                    $http(req).then(function (resp) {
+                        console.log(resp);
+                    });
+                });
             });
         };
         $scope.logout = function () {
