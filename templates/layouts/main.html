@@ -36,53 +36,35 @@
 </head>
 
 <body ng-app="bikeApp">
-    <div ng-controller="loginController">
-    <!--navbar before login-->
-    <div ng-show = "beforeloginnavbar" class = "ng-show">
-        <nav class = "navbar navbar-toggleable-md navbar-light" style = "font-size: 20px">
-            <a class="navbar-brand" href="/#/">HackCU</a>
-            <div class = "collapse navbar-collapse">
-                <ul class = "nav nav-pills pull-right">
-                    <li class = "nav-item">
-                        <a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
-                            Login <span class="caret"></span>
-                        </a>
-                        <ul class="dropdown-menu">
-                            <li>
-                                <button type="button" class = "btn" ng-click="login('facebook')">Facebook</button>
-                            </li>
-                            <li>
-                                <button type="button" class = "btn" ng-click="">Fitbit</button>
-                            </li>
-                        </ul>
-                    </li>
-                </ul>
-            </div>
-        </nav>
-    </div>
     <!--navbar after login-->
-    <div ng-show = "afterloginnavbar" class = "ng-show">
-        <nav class = "navbar navbar-toggleable-md navbar-light" style = "font-size: 20px">
-            <a class="navbar-brand" href="/#/">HackCU</a>
-            <div class = "collapse navbar-collapse">
-                <ul class = "nav nav-pills pull-right">
-                    <li class = "nav-item">
-                        <a class = "nav-link" href="/#/directions">Get Directions</a>
-                    </li>
-                    <li class = "nav-item">
-                        <a class = "nav-link" href="/#/">About</a>
-                    </li>
-                    <li class = "nav-item">
-                        <a class = "nav-link" href="/#/">About</a>
-                    </li>
-                    <li class = "nav-item">
-                        <a class = "nav-link" href="/#/">About</a>
-                    </li>
-                </ul>
+        <nav class = "navbar navbar-default navbar-light" role = "navigation">
+            <div class = "container-fluid">
+                <div class="navbar-header">
+                    <a class="navbar-brand" href="#">HackCU</a>
+                </div>
+                <div class="collapse navbar-collapse">
+                    <ul class="nav navbar-nav">
+                        <li class = "nav-item">
+                            <a class = "nav-link" href="/#/directions">Get Directions</a>
+                        </li>
+                        <li class = "nav-item">
+                            <a class = "nav-link" href="/#/">About</a>
+                        </li>
+                        <li class = "nav-item">
+                            <a class = "nav-link" href="/#/">About</a>
+                        </li>
+                        <li class = "nav-item">
+                            <a class = "nav-link" href="/#/">About</a>
+                        </li>
+                    </ul>
+                </div>
+                <!--
+                <div ng-show = "loggedin" class = "nav navbar-nav navbar-right">
+                    Logged in
+                </div>
+                -->
             </div>
         </nav>
-    </div>
-
 
     <div ng-view></div>
 
