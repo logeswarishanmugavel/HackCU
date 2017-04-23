@@ -10,12 +10,22 @@
         </div>
         <div class ="row">
             <div class = "col-xs-2">
-                <div ng-Repeat = "friend in friendslist">
-                    <div ng-Repeat = ""
+                <div ng-repeat = "item in result">
+                    <br/>
+                    <center>
+                    <button type = type="button" class="list-group-item" ng-click="showroutes(item.route_list)">
+                        {{ item.name }}
+                    </button>
+                    </center>
                 </div>
             </div>
             <div class = "col-xs-2">
-
+                <div ng-Repeat = "route in frndrouteinfo">
+                    <br/>
+                    <center>
+                        <button class = "btn btn-lg btn-primary" ng-click="savedroutes(route.route_info.info)"> Route {{ route.info_id }}</button>
+                    </center>
+                </div>
             </div>
             <div class = "col-xs-8">
                 <div id = "map"></div>

@@ -73,7 +73,9 @@ bikeApp.controller('loginController',[
         var loginstatus = false;
         var fb_id = '';
         $scope.routeinfo = [];
-        $scope.friendslist = [];
+        $scope.frndrouteinfo = [];
+        $scope.result = [];
+        $scope.friendsinfo = [];
         var getuserinfo = function(user_id){
             $http({
                       method: 'GET',
@@ -81,17 +83,22 @@ bikeApp.controller('loginController',[
                }).then(function(response) {
                     console.log(response.data);
                     $scope.routeinfo = response.data.result.route_list;
-                    $scope.friendslist = response.data.result.friends_list;
+                    $scope.friendsinfo = response.data.result.friends_list;
+                    getfriendsinfo();
                });
         }
-        var getfriendsinfo = function(friend_id){
-            $http({
+        var getfriendsinfo = function(){
+            console.log($scope.friendsinfo);
+            for(var i=0;i<$scope.friendsinfo.length;i++){
+                $http({
                       method: 'GET',
-                      url: '/getuserinfo/'+friend_id
+                      url: '/getuserinfo/'+$scope.friendsinfo[i].friend_id
                }).then(function(response) {
-                    console.log(response.data);
-                    //$scope.routeinfo = response.data.result.route_list;
+                    console.log(response.data.result);
+                    $scope.result.push(response.data.result);
                });
+             }
+             console.log($scope.result);
         }
         $scope.onpageload = function(){
                  facebook.checkLogin(function (response){
@@ -108,6 +115,7 @@ bikeApp.controller('loginController',[
                                 }).then(function(response) {
                                        user_id = response.data.user_id;
                                        getuserinfo(user_id);
+
                                 }, function(error) {
                                        console.log(error);
                                 });
@@ -198,29 +206,6 @@ bikeApp.controller('RouteController',['$scope','$http','facebook', function ($sc
     var fb_id,user_id;
     $scope.savebutton = false;
     $scope.successmsg = false;
-    /*$scope.onpageload = function(){
-         facebook.checkLogin(function (response){
-                console.log(response);
-                if(response.status ==='connected'){
-                    loginstatus = true;
-                    fb_id = response.authResponse.userID;
-                    facebook.details(function (details){
-                        $scope.loginform = false;
-                        $http({
-                               method: 'GET',
-                               url: '/getuserid/'+fb_id
-                        }).then(function(response) {
-                               user_id = response.data.user_id;
-                        }, function(error) {
-                               console.log(error);
-                        });
-                    });
-                }
-                else{
-                    loginstatus = false;
-                }
-            });
-    }*/
     var map;
     var plotmap = function(waypoints){
         if(map){
@@ -241,10 +226,11 @@ bikeApp.controller('RouteController',['$scope','$http','facebook', function ($sc
                }
         }).addTo(map);
     }
-
+    $scope.showroutes = function(data){
+        console.log(data);
+        $scope.frndrouteinfo = data;
+    }
     $scope.savedroutes = function(data){
-
-
         var pdata = JSON.parse(data);
         console.log(pdata);
         plotmap(pdata);
