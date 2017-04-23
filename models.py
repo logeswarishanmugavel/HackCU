@@ -50,7 +50,7 @@ class RouteInfo(Base):
     from_lng = Column(Float)
     to_lat = Column(Float)
     to_lng = Column(Float)
-    info = Column(String(10000))
+    info = Column(String(50000))
 
     def __repr__(self):
         return "<RouteInfo: " + str(self.from_lat) + " " + str(self.from_lng) + "," + str(self.to_lat) + " " + str(self.to_lng) + ">"
