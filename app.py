@@ -270,10 +270,16 @@ def get_route(src, dest):
 
 @app.route('/getSongs/<country>/<location>')
 def get_songs(country, location):
+    url_list = []
     params = {'method': 'geo.gettoptracks', 'country': country, 'location': location, 'api_key': LAST_FM_API_KEY,
               'format': 'json'}
     r = requests.get(LAST_FM_URL, params=params)
-    return jsonify(result=json.loads(r.content))
+    content = json.loads(r.content)
+    for i in range(len(content['tracks']['track'])):
+        url_list.append(str(content['tracks']['track'][i]['url']))
+
+    songs_url = {'links': url_list}
+    return jsonify(result=songs_url)
 
 
 def get_lat_long_route(result):
