@@ -1,4 +1,4 @@
-from sqlalchemy import ForeignKey
+from sqlalchemy import ForeignKey, Table
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker, relationship
 from sqlalchemy.ext.declarative import declarative_base
@@ -6,7 +6,7 @@ from sqlalchemy import Column, Integer, String, Float, Date, Boolean
 from marshmallow_sqlalchemy import ModelSchema
 from marshmallow import fields
 
-engine = create_engine('mysql+pymysql://root:loki123@localhost:3306/hackcu', echo=False)
+engine = create_engine('mysql+pymysql://root:root@localhost:3306/hackcu', echo=False)
 db_session = scoped_session(sessionmaker(autocommit=False,
                                          autoflush=False,
                                          bind=engine))
@@ -17,7 +17,7 @@ Base.query = db_session.query_property()
 # Models
 
 class UserInfo(Base):
-    __tablename__ = "UserInfo"
+    __tablename__ = 'UserInfo'
 
     user_id = Column(Integer, primary_key=True)
     name = Column(String(120))
@@ -26,24 +26,24 @@ class UserInfo(Base):
     email_id = Column(String(120))
     fb_id = Column(String(120))
     friends_list = relationship("FriendsList", foreign_keys='FriendsList.user_id')
-    route_list = relationship("UserRouteInfo", foreign_keys='UserRouteInfo.user_id')
+    route_list = relationship("UserRouteInfo")
 
     def __repr__(self):
-        return "<UserInfo: " + self.user_id + ">"
+        return "<UserInfo: " + str(self.user_id) + ">"
 
 
 class FriendsList(Base):
-    __tablename__ = "FriendsList"
+    __tablename__ = 'FriendsList'
 
     user_id = Column(Integer, ForeignKey('UserInfo.user_id'), primary_key=True)
     friend_id = Column(Integer, ForeignKey('UserInfo.user_id'), primary_key=True)
 
     def __repr__(self):
-        return "<FriendsList: " + self.user_id + "," + self.friend_id + ">"
+        return "<FriendsList: " + str(self.user_id) + "," + str(self.friend_id) + ">"
 
 
 class RouteInfo(Base):
-    __tablename__ = "RouteInfo"
+    __tablename__ = 'RouteInfo'
 
     route_id = Column(Integer, primary_key=True)
     from_lat = Column(Float, primary_key=True)
@@ -53,19 +53,20 @@ class RouteInfo(Base):
     info = Column(String(10000))
 
     def __repr__(self):
-        return "<RouteInfo: " + self.from_lat + " " + self.from_lng + "," + self.to_lat + " " + self.to_lng + ">"
+        return "<RouteInfo: " + str(self.from_lat) + " " + str(self.from_lng) + "," + str(self.to_lat) + " " + str(self.to_lng) + ">"
 
 
 class UserRouteInfo(Base):
-    __tablename__ = "UserRouteInfo"
+    __tablename__ = 'UserRouteInfo'
 
     info_id = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey('UserInfo.user_id'))
     trip_date = Column(Date)
     route_id = Column(Integer, ForeignKey('RouteInfo.route_id'))
+    route_info = relationship("RouteInfo")
 
     def __repr__(self):
-        return "<UserRouteInfo: " + self.user_id + "," + self.date + ">"
+        return "<UserRouteInfo: " + str(self.info_id) + ">"
 
 
 class UserInfoSchema(ModelSchema):
@@ -77,7 +78,7 @@ class UserInfoSchema(ModelSchema):
 
 class FriendsListSchema(ModelSchema):
     class Meta:
-        model = FriendsList
+        fields = ['friend_id']
 
 
 class RouteInfoSchema(ModelSchema):
@@ -87,7 +88,8 @@ class RouteInfoSchema(ModelSchema):
 
 class UserRouteInfoSchema(ModelSchema):
     class Meta:
-        model = UserRouteInfo
+        fields = ['trip_date', 'route_id', 'route_info']
+    route_info = fields.Nested("RouteInfoSchema")
 
 
 # Create tables.
