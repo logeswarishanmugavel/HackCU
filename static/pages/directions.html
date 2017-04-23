@@ -1,0 +1,41 @@
+<hr/>
+<div ng-controller = "RouteController" class="container-fluid">
+    <!-- Page Heading/Breadcrumbs -->
+    <div class="row">
+        <div class="col-lg-12">
+            <h1 class="page-header">Get Directions</h1>
+            <ol class="breadcrumb">
+                <li><a href="/#/">Home</a>
+                </li>
+                <li class="active">Get Directions</li>
+            </ol>
+        </div>
+    </div>
+    <div class = "row">
+        <div class = "col-xs-5">
+            <form name = "route_form" ng-submit="" novalidate>
+                <div class = "form-group" ng-class="{ 'has-error' : route_form.source.$invalid && !route_form.source.$pristine }">
+                    <label class = "control-label">Source</label>
+                    <input type = "text" class = "form-control" ng-model = "route.source" name="source" required>
+                    <p ng-show="route_form.source.$invalid && !route_form.source.$pristine" class="help-block">Required field</p>
+                </div>
+                <div class = "form-group" ng-class="{ 'has-error' : route_form.destination.$invalid && !route_form.destination.$pristine }">
+                    <label class = "control-label">Destination</label>
+                    <input type = "text" class = "form-control" ng-model = "route.destination" name="destination" required>
+                    <p ng-show="route_form.destination.$invalid && !route_form.destination.$pristine" class="help-block">Required field</p>
+                </div>
+                <button type="submit" class="btn btn-primary" style = "width:30%; font-size: 22px" ng-disabled="route_form.$invalid">Search Routes</button>
+                <div>
+                    <ol>
+                        <li>
+
+                        </li>
+                    </ol>
+                </div>
+            </form>
+        </div>
+        <div class = "col-xs-7">
+            <div id="mapid"></div>
+        </div>
+    </div>
+</div>

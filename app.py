@@ -6,8 +6,6 @@ from flask import Flask, render_template, jsonify
 from models import db_session
 import json
 import requests
-import urllib2
-
 
 from pprint import pprint
 
@@ -225,6 +223,6 @@ if __name__ == '__main__':
 # Or specify port manually:
 '''
 if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 6000))
+    port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port)
 '''
