@@ -6,14 +6,18 @@ from flask import Flask, render_template, jsonify
 from models import db_session
 import json
 import requests
+import urllib2
+
 
 from pprint import pprint
 
-
-
+WEATHER_URL = 'http://api.openweathermap.org/data/2.5/box/city?bbox={lat1},{long1},{lat2},{long2},{zoom}&appid={appkey}'
+WEATHER_API_KEY = '2feb61047e2d1f0763874018ff395415'
 API_KEY = 'ToZQl1qWNAYdhWRtGKocMb4tG9vEQa7g'
 MAPQUEST_URL = 'http://open.mapquestapi.com/directions/v2/route?key={appkey}'
 MAPQUEST_TRAFFIC_URL='http://www.mapquestapi.com/traffic/v2/incidents?key={appkey}&inFormat=json&outFormat=json'
+MAPQUEST_SEARCH_URL='http://www.mapquestapi.com/search/v2/radius?key={appkey}&inFormat=json&outFormat=json'
+MAPQUEST_GEOCODE_URL='http://www.mapquestapi.com/geocoding/v1/address?key=KEY'
 
 # ----------------------------------------------------------------------------#
 # App Config.
@@ -45,24 +49,103 @@ def about():
     '''
 
 
+def get_weather_conditions(bounding_box):
 
-@app.route('/getdirections')
-def get_route():
+    lat1 = bounding_box['ul']['lat']
+    long1 = bounding_box['ul']['lng']
+    lat2 = bounding_box['lr']['lat']
+    long2 = bounding_box['lr']['lng']
+
+    url_temp = WEATHER_URL.format(lat1=long2, long1=lat1,lat2=long1, long2=lat2,zoom='10', appkey=WEATHER_API_KEY)
+    f = requests.get(url_temp)
+    if f.status_code !=200:
+        print "error while fetching weather conditions."
+    json_parse = f.text
+    return jsonify({'weather':json_parse})
+
+
+
+@app.route('/searchRoute/<addr>')
+def get_search_results(addr):
+
+    geocode_request_body ={
+                            "location": addr,
+                            "options": {
+                                "thumbMaps": "false"
+                            }
+                        }
+
+    r = requests.post(MAPQUEST_SEARCH_URL.format(appkey=API_KEY),
+                      data=json.dumps(geocode_request_body)
+                      )
+    if r.status_code != 200:
+        # We didn't get a response from Mapquest
+        print "error"
+
+    geocode_result = json.loads(r.content)
+    lat_lng = geocode_result['origin']['latLng']
+
+
+    request_body = {
+                    "origin": {
+                        "latLng": lat_lng
+                    },
+                    "options": {
+                        "maxMatches": 15,
+                        "radius": 10
+                    }
+
+                }
+
+    r = requests.post(MAPQUEST_SEARCH_URL.format(appkey=API_KEY),
+                      data=json.dumps(request_body)
+                      )
+    if r.status_code != 200:
+        # We didn't get a response from Mapquest
+        print "error"
+
+    result = json.loads(r.content)
+
+    if "searchResults" in result:
+        search_results = result['searchResults']
+    else:
+        search_results = "No results found."
+
+    ret = {'search_results':search_results}
+    return jsonify(ret)
+
+
+@app.route('/getDirections/<src>/<dest>')
+def get_route(src, dest):
 
     ## get route information along with traffic information.
 
     ## TODO: add from user request.
 
-    src = 'Boulder, CO'
-    dest = 'Denver, CO'
-
-    result = "helo"
 
     request_body = {
         'locations': [
             src,
             dest
-        ]
+        ],
+       "options": {
+            'avoids': ['Toll Road','Ferry','Approximate Seasonal Closure','Limited Access'],
+            'disallows':['Toll Road','Ferry','Approximate Seasonal Closure','Limited Access'],
+            'avoidTimedConditions': 'false',
+            'doReverseGeocode': 'true',
+            'shapeFormat': 'raw',
+            'generalize': 0,
+            'routeType': 'fastest',
+            'timeType': 1,
+            'locale': 'en_US',
+            'unit': 'm',
+            'enhancedNarrative': 'false',
+            'drivingStyle':2,
+            'highwayEfficiency': 21.0,
+            'roadGradeStrategy': 'FAVOR_ALL_HILLS ',
+             'timeType':1,
+
+        }
     }
 
     r = requests.post(MAPQUEST_URL.format(appkey=API_KEY),
@@ -74,12 +157,10 @@ def get_route():
 
     result = json.loads(r.content)
     bounding_box = result['route']['boundingBox']
-    #print pprint(result)
+
+    weather_conditions = get_weather_conditions(bounding_box)
 
     traffic_info = get_traffic_info(bounding_box)
-
-    #print pprint(traffic_info)
-
 
     return json.dumps(result)
 
@@ -130,6 +211,6 @@ if __name__ == '__main__':
 # Or specify port manually:
 '''
 if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 5000))
+    port = int(os.environ.get('PORT', 6000))
     app.run(host='0.0.0.0', port=port)
 '''
