@@ -21,17 +21,22 @@ bikeApp.factory('facebook', ['$window', function($window) {
     FB.init({
         appId : '405452559812718',
         xfbml: true,
-        version: 'v3.0'
+        version: 'v2.9'
     });
 
     return {
         // a me function
         login : function(callback) {
-            FB.login(callback,{scope:'email,public_profile'});
+            FB.login(callback,{scope:'email,public_profile,user_friends'});
         },
-        
         logout: function (callback) {
             FB.logout(callback);
+        },
+        friendslist: function (callback) {
+            FB.api("/me",{fields: 'friends'},callback);
+        },
+        details: function (callback) {
+            FB.api("/me",{fields: 'email,gender,name,age_range'},callback);
         }
 
     }
@@ -52,6 +57,11 @@ bikeApp.controller('loginController',[
     '$scope','facebook', function ($scope,facebook) {
         $scope.login = function () {
             facebook.login(function (data) {
+                console.log(data);
+            });
+        };
+        $scope.getDetails = function () {
+            facebook.details(function (data) {
                 console.log(data);
             });
         };
