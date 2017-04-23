@@ -6,7 +6,7 @@ from sqlalchemy import Column, Integer, String, Float, Date, Boolean
 from marshmallow_sqlalchemy import ModelSchema
 from marshmallow import fields
 
-engine = create_engine('mysql+pymysql://root:root@localhost:3306/hackcu', echo=False)
+engine = create_engine('mysql+pymysql://root:loki123@localhost:3306/hackcu', echo=False)
 db_session = scoped_session(sessionmaker(autocommit=False,
                                          autoflush=False,
                                          bind=engine))
