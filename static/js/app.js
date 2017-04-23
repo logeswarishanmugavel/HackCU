@@ -42,10 +42,8 @@ bikeApp.factory('facebook', ['$window', function($window) {
     }
 }]);
 
-bikeApp.config(['$routeProvider',
-     function($routeProvider) {
-bikeApp.config(['$routeProvider','$locationProvider','FacebookProvider',
-     function($routeProvider,$locationProvider,FacebookProvider) {
+bikeApp.config(['$routeProvider','$locationProvider',
+     function($routeProvider,$locationProvider) {
          $routeProvider.
              when('/', {
                  templateUrl: '/static/pages/welcome.html'
@@ -59,17 +57,17 @@ bikeApp.config(['$routeProvider','$locationProvider','FacebookProvider',
              });
 
          $locationProvider.hashPrefix('');
-         FacebookProvider.init('405452559812718')
     }]);
 
 bikeApp.controller('loginController',[
     '$scope','facebook', function ($scope,facebook) {
-    '$scope','Facebook', function ($scope,Facebook) {
         $scope.beforeloginnavbar = true;
         $scope.afterloginnavbar = false;
         $scope.login = function () {
             facebook.login(function (data) {
                 console.log(data);
+                $scope.beforeloginnavbar = false;
+                $scope.afterloginnavbar = true;
             });
         };
         $scope.getDetails = function () {
@@ -78,12 +76,10 @@ bikeApp.controller('loginController',[
             });
         };
         $scope.logout = function () {
-            facebook.login(function (data) {
-                console.log(data);
-            Facebook.login(function (response) {
+            facebook.logout(function (response) {
                 console.log(response);
-                $scope.beforeloginnavbar = false;
-                $scope.afterloginnavbar = true;
+                $scope.beforeloginnavbar = true;
+                $scope.afterloginnavbar = false;
             });
         }
     }
